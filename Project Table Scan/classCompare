@@ -1,0 +1,18 @@
+class Compareson:
+    def __init__(self, data1, data2):
+        self.data1 = data1
+        self.data2 = data2
+    def Compare(self):
+        result = []
+        wrongAnswers = []
+        for i in range(0, len(self.data1)):
+            for j in range(0, len(self.data1[1])):
+                if self.data1[i][j] != self.data2[i][j]:
+                    result.append([j + 1, i + 1])
+                    if (j + 1) not in wrongAnswers:
+                        wrongAnswers.append(j + 1)
+        return sorted (wrongAnswers)
+    def CorrecrAnswersPercent(self):
+        correctAnswersPercent = round((len(self.data1[1]) - len(self.Compare())) * 100 / (len(self.data1[1])), 1)
+        return correctAnswersPercent
+    
