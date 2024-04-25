@@ -1,0 +1,120 @@
+import cv2
+import imutils
+import numpy as np
+import math
+
+
+class Recognizer:
+    """распознает и выводит данные из ячеек таблицы"""
+
+    def __init__(self, path, columnCount, stringCount):
+        self.path = path
+        self.columnCount = columnCount
+        self.stringCount = stringCount
+
+    def PrepareImage(self):
+        """загрузка и подготовка изображения"""
+        image = cv2.imread(self.path)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (3, 3), 0)
+        _, thresh = cv2.threshold(blur, 150, 255, cv2.THRESH_BINARY)
+        cs = cv2.Canny(thresh, 0, 255)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
+        closed = cv2.morphologyEx(cs, cv2.MORPH_CLOSE, kernel)
+
+        lines = cv2.HoughLinesP(
+            closed, 1, np.pi / 180, 100, minLineLength=100, maxLineGap=10
+        )
+        angle = (
+            np.arctan2(lines[0][0][3] - lines[0][0][1], lines[0][0][2] - lines[0][0][0])
+            * 180
+            / np.pi
+        )
+        rows, cols = image.shape[:2]
+        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)
+        prepareImage = cv2.warpAffine(thresh, M, (cols, rows))
+        return prepareImage
+
+    def ImageCropp(self):
+        """Обрезка изображения(таблицы)"""
+        contours = cv2.findContours(
+            self.PrepareImage(), cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE
+        )
+        contours = imutils.grab_contours(contours)
+
+        def GetMaxCountourIndex(contours):
+            """функция для нахождения индекса контура с максимальной областью"""
+            maxArea = 0
+            indexMaxArea = 0
+            iteration = 0
+            for cnt in contours:
+                contourArea = cv2.contourArea(cnt, True)
+                if maxArea < contourArea:
+                    maxArea = contourArea
+                    indexMaxArea = iteration
+                iteration = iteration + 1
+            return indexMaxArea
+
+        indexMaxArea = GetMaxCountourIndex(contours)
+        x, y, w, h = cv2.boundingRect(contours[indexMaxArea])
+        ROI = self.PrepareImage()[y : y + h, x : x + w]
+        return ROI
+
+    def DataSheet(self):
+        """вывод данных из ячеек таблицы в лист"""
+        cropp = self.ImageCropp()
+        x, y, w, h = cv2.boundingRect(cropp)
+
+        def ColumnStringSize(cellLength, rowCount):
+            """функиця для вычисления размеров ячейки"""
+            cellSize = round((cellLength / rowCount), 1)
+            if cellSize * 10 % 10 <= 5:
+                cellSize = math.floor(cellSize)
+            else:
+                cellSize = math.ceil(cellSize)
+            return cellSize
+
+        cellWidth = ColumnStringSize(w, self.columnCount)
+        cellHeight = ColumnStringSize(h, self.stringCount)
+        x = 0
+        y = 0
+        cellSquare = cellWidth * cellHeight
+        outData = []
+        for i in range(1, self.stringCount + 1):
+            for j in range(1, self.columnCount + 1):
+                cv2.rectangle(
+                    cropp,
+                    (x, y),
+                    (cellWidth * j, cellHeight * i),
+                    (255, 255, 255),
+                    int((cellWidth + cellHeight) // 4),
+                )
+                roi = cropp[y : y + cellHeight, x : x + cellWidth]
+                blackPixel = np.sum(roi == 0)
+                if blackPixel > 0.015 * cellSquare:
+                    outData.append(1)
+                else:
+                    outData.append(0)
+                x = cellWidth * j
+            x = 0
+            y = cellHeight * i
+        return outData
+
+    def MatrixDataSheet(self):
+        """перевод данных в матрицу"""
+        matrix = []
+        row = []
+        outData = self.DataSheet()
+        for i in range(self.stringCount):
+            for j in range(self.columnCount):
+                row.append(outData[self.columnCount * i + j])
+            matrix.append(row)
+            row = []
+        return matrix
+
+
+Answer1 = Recognizer("D:TeacherTestPhoto.jpg", 20, 6)
+Answer2 = Recognizer("D:StudentTestPhotoDark.jpg", 20, 6)
+
+
+
