@@ -114,7 +114,7 @@ class Recognizer:
 
 
 Answer1 = Recognizer("D:TeacherTestPhoto.jpg", 20, 6)
-Answer2 = Recognizer("D:StudentTestPhotoDark.jpg", 20, 6)
+Answer2 = Recognizer("D:StudentTestPhoto.jpg", 20, 6)
 
 
 
