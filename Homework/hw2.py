@@ -7,21 +7,22 @@ class Robot:
         self.velocity = velocity
         self.angle = angle
 
-    def Forward(self, TimeInSeconds):
-        self.TimeInSeconds = TimeInSeconds
-        self.x += self.velocity*TimeInSeconds*cos(self.angle*pi/180)
-        self.y += self.velocity*TimeInSeconds*sin(self.angle*pi/180)
+    def forward(self, time_in_seconds):
+        self.time_in_seconds = time_in_seconds
+        self.x += self.velocity*time_in_seconds*cos(self.angle*pi/180)
+        self.y += self.velocity*time_in_seconds*sin(self.angle*pi/180)
         print('Coordinates of the robot:', self.x, self.y)
-    def Rotate(self, RotateAngle):
-        self.RotateAngle = RotateAngle
-        self.angle += self.RotateAngle
+    def rotate(self, rotate_angle):
+        self.rotate_angle = rotate_angle
+        self.angle += self.rotate_angle
         print('The robot turned to', self.angle, 'degrees.')
     
-    def Stop(self):
+    def stop(self):
         print('The robot stopped.')
 
 Robot1 = Robot(0,0,5,0)
-Robot1.Forward(10)
-Robot1.Rotate(45)
-Robot1.Forward(10)
-Robot1.Stop()
+Robot1.forward(10)
+Robot1.rotate(45)
+Robot1.forward(10)
+Robot1.stop()
+
