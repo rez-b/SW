@@ -1,11 +1,11 @@
 This application is designed to assist with test checking processes.
 
 Features:
-Upload a reference image to identify it contents .
-Upload a test image for comparison.
-Ability to login as teacher or student.
-Test checking done by image comparison.
-Ability to see results on a screen
+* Upload a reference image to identify it contents .
+* Upload a test image for comparison.
+* Ability to login as teacher or student.
+* Test checking done by image comparison.
+* Ability to see results on a screen
 
 User Interface:
 The application will provide an interface to:
