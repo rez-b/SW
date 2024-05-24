@@ -1,6 +1,6 @@
 This application is designed to assist with test checking processes.
 
-Features
+Features:
 Upload a reference image to identify it contents .
 Upload a test image for comparison.
 Ability to login as teacher or student.
